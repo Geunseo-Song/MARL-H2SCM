@@ -18,3 +18,6 @@ year={2024},
 publisher={ELSEVIER}
 }
 ```
+
+## Multi-agent reinforcement learning
+Our model is based on multi-agent reinforcement learning techniques developed by OpenAI.
