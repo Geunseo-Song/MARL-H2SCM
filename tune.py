@@ -66,14 +66,20 @@ if __name__ == "__main__":
             "env": HydroRefuelSys,
             "env_config": {
               "num_HRS": args.num_HRS,
+                # "G_pie_max": [4.08, 11.34],
+                # "B_pie_max": [3.17, 10.43],
+                # "X_pie_max": [2.74, 10.0]
             },
             "disable_env_checking": True,
             "num_workers": 1,
             "multiagent": {
                 "policies": {
-                    "HDS": PolicySpec(observation_space=gym.spaces.Box(0, 10000, shape=(2,3)), action_space=gym.spaces.Box(0, 1, shape=(3,)), config=HDS_config),
-                    "HRS0": PolicySpec(observation_space=gym.spaces.Box(0, 10000, shape=(5,)), action_space=gym.spaces.Box(0, 1, shape=(3,)), config=HRS0_config),
-                    "HRS1": PolicySpec(observation_space=gym.spaces.Box(0, 10000, shape=(5,)), action_space=gym.spaces.Box(0, 1, shape=(3,)), config=HRS1_config)
+                    "HDS": PolicySpec(observation_space=gym.spaces.Box(0, 100000000, shape=(4,3)), 
+                                      action_space=gym.spaces.Box(0, 1, shape=(9,)), config=HDS_config),
+                    "HRS0": PolicySpec(observation_space=gym.spaces.Box(0, 100000000, shape=(8,)), 
+                                       action_space=gym.spaces.Box(0, 1, shape=(5,)), config=HRS0_config),
+                    "HRS1": PolicySpec(observation_space=gym.spaces.Box(0, 10000, shape=(8,)), 
+                                       action_space=gym.spaces.Box(0, 1, shape=(3,)), config=HRS1_config)
                 },
                 "policy_mapping_fn": policy_mapping_fn,
             },
