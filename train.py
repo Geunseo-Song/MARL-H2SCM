@@ -1,4 +1,3 @@
-## train two policy at same time for env2
 import argparse
 import gym
 import os
@@ -6,9 +5,9 @@ import os
 import ray
 from ray import tune
 from ray.rllib.policy.policy import PolicySpec
-from test516 import HydroRefuelSys
+from env_H2SCM import HydroRefuelSys
 
-trial = 516
+trial = 1
 
 def get_cli_args():
     """Create CLI parser and return parsed arguments"""
@@ -30,18 +29,6 @@ def get_cli_args():
     parser.add_argument(
         "--stop-iters", type=int, default=10000000, help="Number of iterations to train."
     )
-    # parser.add_argument(
-    #     "--stop-timesteps",
-    #     type=int,
-    #     default=50,
-    #     help="Number of timesteps to train.",
-    # )
-    # parser.add_argument(
-    #     "--stop-reward",
-    #     type=float,
-    #     default=80.0,
-    #     help="Reward at which we stop training.",
-    # )
     parser.add_argument(
         "--local-mode",
         action="store_true",
@@ -49,7 +36,6 @@ def get_cli_args():
     )
 
     args = parser.parse_args()
-    print(f"Running with following CLI args: {args}")
     return args
 
 
@@ -63,7 +49,6 @@ if __name__ == "__main__":
         # "timesteps_total": args.stop_timesteps,
         # "episode_reward_mean": args.stop_reward,
     }
-
     HDS_config = {
         "lr": 7.028896641361652e-05,
         "train_batch_size": 1036.9835473579633
@@ -76,9 +61,7 @@ if __name__ == "__main__":
         "lr": 2.230682720333346e-05,
         "train_batch_size": 2689.2038627775137
     }
-    # policies = {f"HRS{i}": PolicySpec(observation_space=gym.spaces.Box(0,10000,shape=(5,)), action_space=gym.spaces.Box(0,1,shape=(3,)), config=HRS_config) for i in range(args.num_HRS)}
-    # policies["HDS"] = PolicySpec(observation_space=gym.spaces.Box(0,10000,shape=(2,3)), action_space=gym.spaces.Box(0,1,shape=(3,)), config=HDS_config)
-    # print(policies)
+    
 
     def policy_mapping_fn(agent_id, episdoe, worker, **kwargs):
         if agent_id.startswith("HRS"):
@@ -89,30 +72,19 @@ if __name__ == "__main__":
 
     tune.run(
         args.run,
-        local_dir=f'~/MARL_results/casestudy/trial{trial}',
+        local_dir=f'~/MARL_results/H2SCM/trial{trial}',
         stop=stop,
         config={
             "env": HydroRefuelSys,
             "env_config": {
               "num_HRS": args.num_HRS
-                # "DGmax": [100, 50],
-                # "ELEmax": [250, 150]
                 # "G_pie_max": [4.08, 11.34],
                 # "B_pie_max": [3.17, 10.43],
                 # "X_pie_max": [2.74, 10.0]
             },
             "disable_env_checking": True,
-            # Use GPUs iff `RLLIB_NUM_GPUS` env var set to > 0.
-            # "num_gpus": int(os.environ.get("RLLIB_NUM_GPUS", "1")),
             "num_workers": 1,
-            # "lr": 1e-6,
             "multiagent": {
-                # Use a simple set of policy IDs. Spaces for the individual policies
-                # will be inferred automatically using reverse lookup via the
-                # `policy_mapping_fn` and the env provided spaces for the different
-                # agents. Alternatively, you could use:
-                # policies: {main0: PolicySpec(...), main1: PolicySpec}
-                # "policies": policies,
                 "policies": {
                     "HDS": PolicySpec(observation_space=gym.spaces.Box(0, 100000000, shape=(4, 3)),
                                       action_space=gym.spaces.Box(0, 1, shape=(9,)), config=HDS_config),
@@ -121,13 +93,7 @@ if __name__ == "__main__":
                     "HRS1": PolicySpec(observation_space=gym.spaces.Box(0, 10000, shape=(8,)),
                                        action_space=gym.spaces.Box(0, 1, shape=(3,)), config=HRS1_config)
                 },
-                # Simple mapping fn, mapping agent0 to main0 and agent1 to main1.
-                # "policy_mapping_fn": (
-                #     lambda aid, episode, worker, **kw: f"main{aid[1]}"
-                # ),
                 "policy_mapping_fn": policy_mapping_fn,
-                # Only train main0.
-                # "policies_to_train": ["mainD"],
             },
             "framework": args.framework,
             "eager_tracing": args.eager_tracing,
