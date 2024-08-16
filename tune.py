@@ -1,12 +1,10 @@
 import argparse
 import gym
-import gym
 import ray
 from ray import tune
 from ray.rllib.policy.policy import PolicySpec
 from env_H2SCM import HydroRefuelSys
-from ray.tune.suggest import ConcurrencyLimiter
-from ray.tune.suggest.hyperopt import  HyperOptSearch
+from ray.tune.search.hyperopt import  HyperOptSearch
 from ray.tune.schedulers import AsyncHyperBandScheduler
 from ray.rllib.agents.ppo import ppo
 
